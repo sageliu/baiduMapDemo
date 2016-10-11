@@ -1,0 +1,64 @@
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+  <style type="text/css">
+    body, html,#allmap {width: 100%;height: 100%;overflow: hidden;margin:0;font-family:"微软雅黑";}
+  </style>
+  <!--同步加载的方式-->
+  <!--<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=0D518594d504c02b9271272ddca83c41"></script>-->
+
+  <title>设置驾车路线途经点</title>
+</head>
+<body>
+<div id="allmap"></div>
+</body>
+</html>
+<script>
+  //异步加载
+  function loadScript() {
+    var script = document.createElement("script");
+    script.src = "http://api.map.baidu.com/api?v=2.0&ak=0D518594d504c02b9271272ddca83c41&callback=initialize";
+    //此为v2.0版本的引用方式
+    // http://api.map.baidu.com/api?v=1.4&ak=您的密钥&callback=initialize";
+    // 此为v1.4版本及以前版本的引用方式
+    document.body.appendChild(script);
+  }
+
+  window.onload = loadScript;
+</script>
+<script type="text/javascript">
+//异步加载必须把代码放到这个initialize初始化函数中，因为jsonp中的callback写的是这个函数
+  function initialize() {
+// 百度地图API功能
+    var map = new BMap.Map("allmap");
+    //初始化地图，allmap是ID，与上面的ID对应
+    map.centerAndZoom(new BMap.Point(116.404, 39.915), 11);
+    //初始中心点，和缩放比例
+    map.enableScrollWheelZoom(true);
+    //允许鼠标滚轮缩放
+
+    var p1 = new BMap.Point(116.301934,39.977552);
+    var p2 = new BMap.Point(116.508328,39.919141);
+
+    var driving = new BMap.DrivingRoute(map, {renderOptions:{map: map, autoViewport: true},
+      //自动缩放级别
+      onPolylinesSet:function(routes) {
+        searchRoute = routes[0].getPolyline();//导航路线
+        console.log(searchRoute);
+        map.addOverlay(searchRoute);
+      },
+      onMarkersSet:function(routes) {
+
+//      map.removeOverlay(routes[0].marker); //删除起点
+//      map.removeOverlay(routes[3].marker);//删除终点
+
+        map.removeOverlay(routes[1].Lm);//删除经这个图标
+        map.removeOverlay(routes[2].Lm);//删除经这个图标
+        console.log(routes);
+      }
+    });
+    driving.search(p1, p2,{waypoints:["故宫","对外经贸大学"]});//waypoints表示途经点
+
+  }
+</script>
